@@ -1,0 +1,15 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "ubuntu/xenial64"
+
+  config.vm.hostname = "studio-69445.localdev"
+  config.vm.network :private_network, ip: "192.168.169.169"
+
+  config.vm.provision :shell, :path => "scripts/vagrant/provision.sh"
+
+  config.vm.provider "virtualbox" do |vb|
+      vb.memory = 1024
+  end
+end
