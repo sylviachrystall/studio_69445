@@ -1,0 +1,8 @@
+# Vagrant VM directory
+.vagrant/
+
+# Node project dependencies
+node_modules/
+
+# Logs
+*.log
