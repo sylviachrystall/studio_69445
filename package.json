@@ -1,17 +1,21 @@
 {
   "name": "vagrant",
-  "version": "1.0.0",
+  "version": "0.8.0",
   "main": "index.js",
   "private": true,
   "scripts": {
     "gulp": "gulp --gulpfile scripts/gulp/index.js",
     "clear": "yarn run gulp clear",
     "build": "yarn run gulp build",
-    "watch": "yarn run gulp watch"
+    "watch": "yarn run gulp watch",
+    "bump-major": "yarn run gulp bump-major",
+    "bump-minor": "yarn run gulp bump-minor",
+    "bump-patch": "yarn run gulp bump-patch",
+    "dist": "yarn run gulp dist"
   },
   "repository": "https://github.com/sylviachrystall/studio_69445.git",
   "author": "Sinenonymous <sinenonymous@gmail.com>",
-  "license": "MIT",
+  "license": "EPLA (see in LICENSE.md)",
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-preset-env": "^1.6.1",
@@ -20,6 +24,10 @@
     "browserify": "^14.5.0",
     "del": "^3.0.0",
     "gulp": "^3.9.1",
+    "gulp-bump": "^2.8.0",
+    "gulp-clean-css": "^3.9.0",
+    "gulp-htmlmin": "^3.0.0",
+    "gulp-inject": "^4.3.0",
     "gulp-merge": "^0.1.1",
     "gulp-nunjucks": "^3.0.0",
     "gulp-plumber": "^1.1.0",
@@ -27,6 +35,7 @@
     "gulp-sass": "^3.1.0",
     "gulp-sequence": "^0.4.6",
     "gulp-sourcemaps": "^2.6.1",
+    "gulp-uglify": "^3.0.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
   }

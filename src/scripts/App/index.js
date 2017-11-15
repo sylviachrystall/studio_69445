@@ -1,4 +1,8 @@
 
+import StyleAsset  from '../Assets/StyleAsset';
+import MarkupAsset from '../Assets/MarkupAsset';
+import Studio      from '../Studio';
+
 import {
 
     uid
@@ -6,6 +10,7 @@ import {
 } from '../Common';
 
 
+const __LOADED_INDICATOR = '___' + uid(32) + 'Loaded';
 const __EXTERNAL_ACCESS_HANDLE = '___' + uid(32) + 'StudioApp';
 
 
@@ -18,64 +23,68 @@ class App
     }
 
 
-    isInitialized()
+    isLoaded()
     {
-        return this._isInitialized === true;
+        return !!window[__LOADED_INDICATOR];
     }
 
 
     init()
     {
-        window[__EXTERNAL_ACCESS_HANDLE] = () => {
-            console.log('new app inited');
-
-            /*
-            if (typeof window.jQuery === 'function') {
-                console.log('jQuery present', jQuery().jquery);
-            } else {
-                console.log('jQuery is not present');
-            }
-            */
-            
-
-            const timeout = Date.now();
-
+        if ( ! this.isLoaded() ) {
             const intervalId = setInterval(
                 () => {
-                    console.log('check');
-
                     if (typeof window.jQuery === 'function') {
-                        console.log('jQuery is present', jQuery().jquery);
                         clearInterval(intervalId);
-                    }
 
-                    if (Date.now() - timeout > 15000) {
-                        console.log('check timed out');
-                        clearInterval(intervalId);
+                        $(() => {
+                            this._loadAssets();
+                            this._loadStudio();
+                        });
                     }
                 },
                 15
             );
-        };
 
-        this._addScriptTag();
+            //this._addScriptTag();
+        }
+
+        window[__LOADED_INDICATOR] = true;
     }
 
 
-    load()
-    {
-        // console.log('load app');
-    }
-
-
+    /*
     _addScriptTag()
     {
         const script = document.createElement('script');
 
         script.setAttribute('type', 'text/javascript');
-        script.appendChild(document.createTextNode(`window.${__EXTERNAL_ACCESS_HANDLE}();`));
+        script.appendChild(document.createTextNode(`window['${__EXTERNAL_ACCESS_HANDLE}']();`));
 
         document.body.appendChild(script);
+    }
+    */
+
+
+    _loadAssets()
+    {
+        StyleAsset.load();
+        MarkupAsset.load();
+    }
+
+
+    _loadStudio()
+    {
+        Studio.init({
+            studioId    : '69445',
+            baseUrl     : 'https://www.clips4sale.com',
+            assetUrl    : 'https://studio.clips4sale.com/accounts150',
+            categoryUrl : 'https://www.clips4sale.com/studio/69445/sylvia-chrystall/Cat0-AllCategories/Page1/SortBy-bestmatch/Limit10/search',
+        });
+
+        Studio.addCategories();
+        Studio.handleEmailAddress();
+        Studio.addMarker(Studio.STUDIO_LOADED);
     }
 }
 

@@ -1,16 +1,22 @@
-const gulp       = require('gulp'),
-      del        = require('del'),
-      merge      = require('gulp-merge'),
-      nunjucks   = require('gulp-nunjucks'),
-      rename     = require('gulp-rename'),
-      sourcemaps = require('gulp-sourcemaps'),
-      babelify   = require('babelify'),
-      browserify = require('browserify'),
-      source     = require('vinyl-source-stream'),
-      buffer     = require('vinyl-buffer'),
-      sass       = require('gulp-sass'),
-      sequence   = require('gulp-sequence'),
-      p          = require('path');
+const gulp         = require('gulp'),
+      del          = require('del'),
+      merge        = require('gulp-merge'),
+      bump         = require('gulp-bump'),
+      plumber      = require('gulp-plumber'),
+      inject       = require('gulp-inject'),
+      nunjucks     = require('gulp-nunjucks'),
+      htmlMinifier = require('gulp-htmlmin'),
+      rename       = require('gulp-rename'),
+      sourcemaps   = require('gulp-sourcemaps'),
+      babelify     = require('babelify'),
+      browserify   = require('browserify'),
+      uglify       = require('gulp-uglify'),
+      source       = require('vinyl-source-stream'),
+      buffer       = require('vinyl-buffer'),
+      sass         = require('gulp-sass'),
+      cleanCss     = require('gulp-clean-css'),
+      sequence     = require('gulp-sequence'),
+      p            = require('path');
 
 
 /**
@@ -65,7 +71,10 @@ function path(property)
           root = norm(__dirname + '/../../');
 
     const paths = {
+        root    : norm(`${root}`),
+        package : norm(`${root}/package.json`),
         build   : norm(`${root}/build`),
+        dist    : norm(`${root}/dist`),
         src     : norm(`${root}/src`),
         data    : norm(`${root}/src/data`),
         markup  : norm(`${root}/src/markup`),
@@ -127,21 +136,20 @@ gulp.task(
 
 
 gulp.task(
-    'build.markup',
+    'build.main',
     () => {
-        // Build markup
-        return gulp
+        const markup = gulp
             .src(path('markup') + '/markup.nunj')
+            .pipe(plumber())
             .pipe(nunjucks.compile({ data : data }))
-            .pipe(rename({ basename: 'main', extname : '.html' }))
-            .pipe(gulp.dest(path('build')));
-    }
-);
+            .pipe(htmlMinifier({ collapseWhitespace: true } ));
 
+        const styles = gulp
+            .src(path('styles') + '/main.sass')
+            .pipe(plumber())
+            .pipe(sass.sync().on('error', sass.logError))
+            .pipe(cleanCss({ compatibility: 'ie8' }));
 
-gulp.task(
-    'build.scripts',
-    () => {
         // Build scripts
         return browserify({
                 debug: true,
@@ -151,24 +159,42 @@ gulp.task(
             })
             .transform(babelify.configure({ presets : ["es2015"] }))
             .bundle()
+            .on('error',
+                function(err) {
+                    console.error(err);
+                    this.emit('end');
+                }
+            )
+            .pipe(plumber())
             .pipe(source('main.js'))
             .pipe(buffer())
-            .pipe(sourcemaps.init({ loadMaps: true }))
-            .pipe(sourcemaps.write())
-            .pipe(gulp.dest(path('build')));
-    }
-);
-
-
-gulp.task(
-    'build.styles',
-    () => {
-        // Build styles
-        return gulp
-            .src(path('styles') + '/main.sass')
-            .pipe(sourcemaps.init())
-            .pipe(sass.sync().on('error', sass.logError))
-            .pipe(sourcemaps.write())
+            // .pipe(sourcemaps.init({ loadMaps: true }))
+            // inject markup
+            .pipe(inject(
+                markup,
+                {
+                    starttag   : '<<<< inject-markup',
+                    endtag     : 'markup-end >>>>',
+                    removeTags : true,
+                    transform  : function (filepath, file) {
+                        return file.contents.toString('utf8');
+                    }
+                }
+            ))
+            // inject styles
+            .pipe(inject(
+                styles,
+                {
+                    starttag   : '<<<< inject-styles',
+                    endtag     : 'styles-end >>>>',
+                    removeTags : true,
+                    transform  : function (filepath, file) {
+                        return file.contents.toString('utf8');
+                    }
+                }
+            ))
+            .pipe(uglify())
+            // .pipe(sourcemaps.write())
             .pipe(gulp.dest(path('build')));
     }
 );
@@ -179,9 +205,34 @@ gulp.task(
     (cb) => {
         sequence(
             'build.copy',
-            'build.markup',
-            'build.scripts',
-            'build.styles'
+            'build.main'
+        )(cb);
+    }
+);
+
+
+gulp.task(
+    'dist.build',
+    () => {
+        const pkg     = require(path('package')),
+              version = pkg.version,
+              suffix  = version.replace(/\./g, '_');
+
+        return gulp
+            .src(path('build') + '/main.js')
+            .pipe(uglify())
+            .pipe(rename({ suffix : `_${suffix}` }))
+            .pipe(gulp.dest(path('dist')));
+    }
+);
+
+
+gulp.task(
+    'dist',
+    (cb) => {
+        sequence(
+            'build',
+            'dist.build'
         )(cb);
     }
 );
@@ -210,5 +261,38 @@ gulp.task(
                 'make',
             ]
         );
+    }
+);
+
+
+gulp.task(
+    'bump-major',
+    () => {
+        return gulp
+            .src(path('package'))
+            .pipe(bump({ type: 'major' }))
+            .pipe(gulp.dest(path('root')));
+    }
+);
+
+
+gulp.task(
+    'bump-minor',
+    () => {
+        return gulp
+            .src(path('package'))
+            .pipe(bump({ type: 'minor' }))
+            .pipe(gulp.dest(path('root')));
+    }
+);
+
+
+gulp.task(
+    'bump-patch',
+    () => {
+        return gulp
+            .src(path('package'))
+            .pipe(bump({ type: 'patch' }))
+            .pipe(gulp.dest(path('root')));
     }
 );
