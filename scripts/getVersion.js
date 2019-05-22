@@ -6,7 +6,7 @@ const semver = require('semver')
 const arg = process.argv[process.argv.length - 1] || ''
 const version = arg.substring(2)
 
-module.exports = () => {
+function getVersion () {
   // check version validity
   if (semver.valid(version) === null) {
     throw Error(`Version is invalid, got: "${version}".`)
@@ -14,3 +14,7 @@ module.exports = () => {
 
   return version
 }
+
+getVersion.packageVersion = require('../package.json').version
+
+module.exports = getVersion

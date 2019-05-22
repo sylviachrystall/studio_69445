@@ -4,22 +4,22 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "start": "webpack-dev-server",
+    "start": "webpack-dev-server --config scripts/webpack.config.js",
     "style:check": "standard --verbose | snazzy",
     "style:fix": "standard --verbose --fix | snazzy",
     "test": "npm run style:check",
-    "release": "gulp release",
-    "build": "webpack --mode=production",
+    "release": "gulp --gulpfile scripts/gulpfile.js release",
+    "build": "webpack --config scripts/webpack.config.js --mode=production",
     "commit": "git-cz"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/sinenonymous/studio_69445.git"
+    "url": "https://github.com/sylviachrystall/studio_69445.git"
   },
   "keywords": [],
   "author": "Sinenonymous <sinenonymous@gmail.com> (https://github.com/sinenonymous)",
   "bugs": {
-    "url": "https://github.com/sinenonymous/studio_69445/issues"
+    "url": "https://github.com/sylviachrystall/studio_69445/issues"
   },
   "standard": {
     "globals": [
@@ -27,7 +27,7 @@
       "__VERSION__"
     ]
   },
-  "homepage": "https://github.com/sinenonymous/studio_69445#readme",
+  "homepage": "https://github.com/sylviachrystall/studio_69445#readme",
   "license": "EPLA (see in LICENSE.md)",
   "devDependencies": {
     "@babel/core": "^7.4.4",
@@ -37,7 +37,6 @@
     "@semantic-release/exec": "^3.3.2",
     "@semantic-release/git": "^7.0.8",
     "@semantic-release/github": "^5.2.10",
-    "@semantic-release/npm": "^5.1.8",
     "@semantic-release/release-notes-generator": "^7.1.4",
     "axios": "^0.18.0",
     "babel-loader": "^8.0.6",
@@ -58,7 +57,7 @@
     "postcss-loader": "^3.0.0",
     "postcss-preset-env": "^6.6.0",
     "sass-loader": "^7.1.0",
-    "semantic-release": "^15.13.14",
+    "semantic-release": "^15.13.12",
     "snazzy": "^8.0.0",
     "standard": "^12.0.1",
     "webpack": "^4.31.0",

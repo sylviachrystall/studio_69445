@@ -87,8 +87,6 @@ typings/
 # IDE directories
 .vscode/
 
-# release directories
+# development directory
 /dev
-/build
-/deploy
 /dist

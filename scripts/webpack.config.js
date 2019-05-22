@@ -3,19 +3,20 @@
 const path = require('path')
 const webpack = require('webpack')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-const inDevelopment = require('./scripts/webpack-modeful').inDevelopment
-const inProduction = require('./scripts/webpack-modeful').inProduction
-const whenDevelopment = require('./scripts/webpack-modeful').whenDevelopment
-const whenProduction = require('./scripts/webpack-modeful').whenProduction
-const getVersion = require('./scripts/getVersion')
+const inDevelopment = require('./webpack-modeful').inDevelopment
+const inProduction = require('./webpack-modeful').inProduction
+const whenDevelopment = require('./webpack-modeful').whenDevelopment
+const whenProduction = require('./webpack-modeful').whenProduction
+const getVersion = require('./getVersion')
 
-const version = inProduction ? getVersion() : require('./package.json').version
+const VERSION = inProduction ? getVersion() : getVersion.packageVersion
+const ROOT = path.join(__dirname, '../')
 
 module.exports = {
   entry: './src/scripts/index.js',
 
   output: {
-    path: path.join(__dirname, inDevelopment ? '/dev' : '/dist'),
+    path: path.join(ROOT, inDevelopment ? '/dev' : '/dist'),
     publicPath: '/',
     filename: 'scripts.js'
   },
@@ -28,8 +29,8 @@ module.exports = {
       { test: /\.hbs$/,
         loader: 'handlebars-loader',
         query: {
-          helperDirs: [ path.join(__dirname, '/src/markup/helpers') ],
-          partialDirs: [ path.join(__dirname, '/src/markup/partials') ]
+          helperDirs: [ path.join(ROOT, '/src/markup/helpers') ],
+          partialDirs: [ path.join(ROOT, '/src/markup/partials') ]
         }
       },
       // Style processing
@@ -65,25 +66,25 @@ module.exports = {
 
   plugins: [
     new webpack.DefinePlugin({
-      __VERSION__: JSON.stringify(version)
+      __VERSION__: JSON.stringify(VERSION)
     }),
     ...whenDevelopment(
       new CopyWebpackPlugin([
         // copy jquery
-        { from: path.join(__dirname, '/node_modules/jquery/dist/jquery.min.js'),
-          to: path.join(__dirname, '/dev') },
+        { from: path.join(ROOT, '/node_modules/jquery/dist/jquery.min.js'),
+          to: path.join(ROOT, '/dev') },
         // copy index.html
-        { from: path.join(__dirname, '/src/markup/index.html'),
-          to: path.join(__dirname, '/dev') }
+        { from: path.join(ROOT, '/src/markup/index.html'),
+          to: path.join(ROOT, '/dev') }
       ])
     ),
     ...whenProduction(
-      new webpack.BannerPlugin({ banner: `EPLA (c) 2015-2019 Sylvia Chrystall v${version}` })
+      new webpack.BannerPlugin({ banner: `EPLA (c) 2015-2019 Sylvia Chrystall v${VERSION}` })
     )
   ],
 
   devServer: {
-    contentBase: path.join(__dirname, '/dev'),
+    contentBase: path.join(ROOT, '/dev'),
     writeToDisk: true,
     compress: true
   }
