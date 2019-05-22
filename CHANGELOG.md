@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/sylviachrystall/studio_69445/compare/v1.0.0...v1.1.0) (2019-05-22)
+
+
+### Features
+
+* **version:** replace dots with underscores in class name ([4d8bf23](https://github.com/sylviachrystall/studio_69445/commit/4d8bf23))
+
 # 1.0.0 (2019-05-22)
 
 
