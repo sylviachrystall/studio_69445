@@ -98,7 +98,7 @@ gulp.task('release:create-content', async () => {
 
   // commit files with next version
   await run('git', ['add', '-f', 'dist'], { cwd: ROOT })
-  await run('git', ['commit', '-m', `chore(release): ${version}`], { cwd: ROOT })
+  await run('git', ['commit', '-m', `chore(release): ${version} [skip ci]`], { cwd: ROOT })
 })
 
 gulp.task('release:push-repo', async () => {
