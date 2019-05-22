@@ -109,6 +109,6 @@ class Studio {
 const singleton = new Studio()
 
 singleton.STUDIO_LOADED = 'studio-loaded'
-singleton.STUDIO_VERSION = 'studio-version-' + __VERSION__
+singleton.STUDIO_VERSION = 'studio-version-' + __VERSION__.replace(/\./g, '_')
 
 export default singleton
