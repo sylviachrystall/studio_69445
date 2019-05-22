@@ -1,3 +1,11 @@
+# 1.0.0 (2019-05-22)
+
+
+### Features
+
+* **migration:** migrate project ([00abc2d](https://github.com/sylviachrystall/studio_69445/commit/00abc2d))
+* **migration:** refactor release scripts ([208793a](https://github.com/sylviachrystall/studio_69445/commit/208793a))
+
 # [1.3.0](https://github.com/sinenonymous/studio_69445/compare/v1.2.1...v1.3.0) (2019-05-22)
 
 
