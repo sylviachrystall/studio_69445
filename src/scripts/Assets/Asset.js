@@ -1,29 +1,14 @@
 
-
-class Asset
-{
-
-    constructor()
-    {
-        // noop
-    }
-
-
-    load()
-    {
-
-    }
+class Asset {
+  load () {}
 }
 
+Asset.getHead = function () {
+  if (!this.__head) {
+    this.__head = document.head || document.getElementsByTagName('head')[0]
+  }
 
-Asset.getHead = function()
-{
-    if ( ! this.__head) {
-        this.__head = document.head || document.getElementsByTagName('head')[0];
-    }
+  return this.__head
+}
 
-    return this.__head;
-};
-
-
-export default Asset;
+export default Asset

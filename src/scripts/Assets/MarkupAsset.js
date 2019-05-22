@@ -1,22 +1,15 @@
 
-import Asset from './Asset';
+import Asset from './Asset'
+import markup from '../../markup/index.hbs'
 
+class MarkupAsset extends Asset {
+  load () {
+    const container = $('.topStudioHTML')
 
-const __CONTENT = '<<<< inject-markup markup-end >>>>';
-
-
-class MarkupAsset extends Asset
-{
-
-    load()
-    {
-        const container = $('.topStudioHTML');
-
-        // Remove jScrollPane
-        container.find('.scrollBox').remove();
-        container.append(__CONTENT);
-    }
+    // Remove jScrollPane
+    container.find('.scrollBox').remove()
+    container.append(markup())
+  }
 }
 
-
-export default new MarkupAsset();
+export default new MarkupAsset()

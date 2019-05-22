@@ -1,237 +1,114 @@
+import data from '../../data'
+import ImageBox from './ImageBox'
+import normalize from '../Common/string-normalize'
+import crush from '../Common/string-crush'
 
+/**
+ * @typedef {Object} StudioOptions
+ *
+ * @property {string} studioId
+ * @property {string} baseUrl
+ * @property {string} assetUrl
+ * @property {string} categoryUrl
+ */
 
-import ImageBox from './ImageBox';
+class Studio {
+  /**
+   * @param {StudioOptions} options
+   */
+  init (options) {
+    this._html = $('html')
 
+    this._studioId = options.studioId
+    this._baseUrl = options.baseUrl
+    this._assetUrl = options.assetUrl
+    this._categoryUrl = options.categoryUrl
+  }
 
-class Studio
-{
+  hasMarker (className) {
+    return this._html.hasClass(className)
+  }
 
-    constructor()
-    {
-        // noop
-    }
+  addMarker (className) {
+    return this._html.addClass(className)
+  }
 
+  getBaseUrl () {
+    return this._baseUrl
+  }
 
-    /**
-     * @typedef {Object} StudioOptions
-     *
-     * @property {string} studioId
-     * @property {string} baseUrl
-     * @property {string} assetUrl
-     * @property {string} categoryUrl
-     */
+  getId () {
+    return this._studioId
+  }
 
+  getStoreUrl () {
+    return this.getBaseUrl() + '/' + this.getId()
+  }
 
-    /**
-     * @param {StudioOptions} options
-     */
-    init(options)
-    {
-        this._html = $('html');
+  getAssetUrl (url) {
+    return this._assetUrl + '/' + this.getId() + '/images/' + url
+  }
 
-        this._studioId    = options.studioId;
-        this._baseUrl     = options.baseUrl;
-        this._assetUrl    = options.assetUrl;
-        this._categoryUrl = options.categoryUrl;
-    }
+  getCategoryUrl (category) {
+    category = category.toUpperCase()
+    category = category.replace(/\s+/g, '+')
 
+    return this._categoryUrl + '/' + category
+  }
 
-    hasMarker(className)
-    {
-        return this._html.hasClass(className);
-    }
+  addCategories () {
+    for (let [mainCategory, entries] of Object.entries(data.categories)) {
+      const container = this._html.find(`.categories-${mainCategory}`)
 
+      entries.forEach(category => {
+        const image = new ImageBox()
 
-    addMarker(className)
-    {
-        return this._html.addClass(className);
-    }
+        image.setText(category.text)
+        image.setClass(crush(normalize(category.text)))
+        image.setSource(category.image)
 
-
-    getBaseUrl()
-    {
-        return this._baseUrl;
-    }
-
-
-    getId()
-    {
-        return this._studioId;
-    }
-
-
-    getStoreUrl()
-    {
-        return this.getBaseUrl() + '/' + this.getId();
-    }
-
-
-    getAssetUrl(url)
-    {
-        return this._assetUrl + '/' + this.getId() + '/images/' + url;
-    }
-
-
-    getCategoryUrl(category)
-    {
-        category = category.toUpperCase();
-        category = category.replace(/\s+/g, '+');
-
-        return this._categoryUrl + '/' + category;
-    }
-
-
-    addCategories()
-    {
-        const containerTop    = $('.categories-top'),
-              containerBottom = $('.categories-bottom'),
-              containerBack   = $('.categories-back');
-
-        /**
-         * @type {ImageBox[]}
-         */
-        const categoriesTop = [
-            ImageBox.create()
-                .setText('Blowjobs')
-                .setCategory('blow jobs')
-                .setSource('cat_blowjobs_000.jpg')
-                ,
-            ImageBox.create()
-                .setText('Bondage')
-                .setCategory('bondage sex')
-                .setSource('cat_bondage_000.jpg')
-                ,
-            ImageBox.create()
-                .setText('Facials')
-                .setSource('cat_facials_000.jpg')
-                ,
-            ImageBox.create()
-                .setText('Female Domination')
-                .setClass('femdom')
-                .setSource('cat_female_domination_000.jpg')
-                ,
-            ImageBox.create()
-                .setText('Footjobs')
-                .setSource('cat_footjobs_000.jpg')
-                ,
-            ImageBox.create()
-                .setText('Fucking')
-                .setSource('cat_fucking_000.jpg')
-                ,
-            ImageBox.create()
-                .setText('Glove Fetish')
-                .setClass('glofet')
-                .setSource('cat_glove_fetish_000.jpg')
-                ,
-            ImageBox.create()
-                .setText('Handjobs')
-                .setSource('cat_handjobs_000.jpg')
-                ,
-        ];
-
-
-        /**
-         * @type {ImageBox[]}
-         */
-        const categoriesBottom = [
-            ImageBox.create()
-                .setText('Leather Fetish')
-                .setClass('letfet')
-                .setSource('cat_leather_fetish_000.jpg')
-                ,
-            ImageBox.create()
-                .setText('Male Cum Swallowers')
-                .setClass('malecum')
-                .setSource('cat_male_cum_swallowers_000.jpg')
-                ,
-            ImageBox.create()
-                .setText('Mixed Wrestling')
-                .setClass('mixwre')
-                .setSource('cat_mixed_wrestling_000.jpg')
-                ,
-            ImageBox.create()
-                .setText('Pussy Eating')
-                .setClass('puseat')
-                .setSource('cat_pussy_eating_000.jpg')
-                ,
-            ImageBox.create()
-                .setText('Redheads')
-                .setSource('cat_redheads_000.jpg')
-                ,
-            ImageBox.create()
-                .setText('Smoking')
-                .setSource('cat_smoking_000.jpg')
-                ,
-            ImageBox.create()
-                .setText('Taboo')
-                .setSource('cat_taboo_000.jpg')
-                ,
-            ImageBox.create()
-                .setText('Wrist Watch Fetish')
-                .setClass('wwf')
-                .setSource('cat_wrist_watch_fetish_000.jpg')
-                ,
-        ];
-
-
-        /**
-         * @type {ImageBox[]}
-         */
-        const categoriesBack = [
-            ImageBox.create()
-                .setText('Back<br>To All<br>Categories')
-                .setClass('back')
-                .setSource(null)
-                .setCategory(null)
-                ,
-        ];
-
-
-        function addCategories(container, category) {
-            category.forEach((category) => { container.append(category.getElement()); });
+        if (category.category === false) {
+          image.setCategory(false)
+        } else {
+          image.setCategory(category.category ? category.category : normalize(category.text))
         }
 
-        addCategories(containerTop,    categoriesTop);
-        addCategories(containerBottom, categoriesBottom);
-        addCategories(containerBack,   categoriesBack);
+        container.append(image.getElement())
+      })
     }
+  }
 
+  handleEmailAddress () {
+    $('.emailto').on('click', event => {
+      const link = $(event.currentTarget)
 
-    handleEmailAddress()
-    {
-        $('.emailto').on(
-            'click',
-            (event) => {
-                let link    = $(event.currentTarget),
-                    email   = link.data('email'),
-                    subject = link.data('subject');
+      let email = link.data('email')
 
-                if (!email) {
-                    console.log('Email data were not specified.');
-                    return false;
-                }
+      if (!email) {
+        console.log('Email data were not specified.')
+        return false
+      }
 
-                email = 'mailto:' + email;
+      email = 'mailto:' + email
 
-                if (subject) {
-                    subject = '?subject=' + subject;
-                } else {
-                    subject = '';
-                }
+      let subject = link.data('subject')
 
-                window.location = email + subject;
+      if (subject) {
+        subject = '?subject=' + subject
+      } else {
+        subject = ''
+      }
 
-                return false;
-            }
-        );
-    }
+      window.location = email + subject
+
+      return false
+    })
+  }
 }
 
+const singleton = new Studio()
 
-const singleton = new Studio();
+singleton.STUDIO_LOADED = 'studio-loaded'
+singleton.STUDIO_VERSION = 'studio-version-' + __VERSION__
 
-
-singleton.STUDIO_LOADED = 'studio-loaded';
-
-
-export default singleton;
+export default singleton

@@ -1,10 +1,10 @@
 
-import uid from './uid';
+import uid from './uid'
 
 export default {
-    uid,
-};
+  uid
+}
 
 export {
-    uid,
-};
+  uid
+}
