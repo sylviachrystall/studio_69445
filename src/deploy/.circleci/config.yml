@@ -1,0 +1,13 @@
+version: 2
+
+jobs:
+  skip:
+    machine: true
+    steps:
+      - checkout
+
+workflows:
+  version: 2
+  skip:
+    jobs:
+      - skip
