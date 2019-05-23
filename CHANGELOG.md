@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/sylviachrystall/studio_69445/compare/v1.1.1...v1.1.2) (2019-05-23)
+
+
+### Bug Fixes
+
+* **formatting:** minor formatting ([16fdab0](https://github.com/sylviachrystall/studio_69445/commit/16fdab0))
+
 ## [1.1.1](https://github.com/sylviachrystall/studio_69445/compare/v1.1.0...v1.1.1) (2019-05-23)
 
 
