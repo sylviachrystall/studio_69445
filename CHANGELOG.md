@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/sylviachrystall/studio_69445/compare/v1.1.0...v1.1.1) (2019-05-23)
+
+
+### Bug Fixes
+
+* **readme:** add license section ([11a7257](https://github.com/sylviachrystall/studio_69445/commit/11a7257))
+
 # [1.1.0](https://github.com/sylviachrystall/studio_69445/compare/v1.0.0...v1.1.0) (2019-05-22)
 
 
