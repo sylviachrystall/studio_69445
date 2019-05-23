@@ -8,6 +8,7 @@ const inProduction = require('./webpack-modeful').inProduction
 const whenDevelopment = require('./webpack-modeful').whenDevelopment
 const whenProduction = require('./webpack-modeful').whenProduction
 const getVersion = require('./getVersion')
+const license = require('../src/data/license')
 
 const VERSION = inProduction ? getVersion() : getVersion.packageVersion
 const ROOT = path.join(__dirname, '../')
@@ -79,7 +80,7 @@ module.exports = {
       ])
     ),
     ...whenProduction(
-      new webpack.BannerPlugin({ banner: `EPLA (c) 2015-2019 Sylvia Chrystall v${VERSION}` })
+      new webpack.BannerPlugin({ banner: `${license.banner} v${VERSION}` })
     )
   ],
 

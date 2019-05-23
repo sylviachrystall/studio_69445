@@ -7,11 +7,13 @@ const run = require('execa')
 const delay = require('delay')
 const axios = require('axios')
 const url = require('url')
+const template = require('gulp-template')
 const path = require('path')
 const getVersion = require('./getVersion')
 
-const ROOT = path.join(__dirname, '/../')
-const DIST = path.join(ROOT, '/dist')
+const DIST = path.join(__dirname, '/../dist')
+const DEPLOY = path.join(__dirname, '/../src/deploy')
+const REPO = require('../package.json').repository.url
 
 /**
  * Returns an URL without its protocol and separator.
@@ -34,30 +36,16 @@ function withoutProtocol (urlString) {
 }
 
 /**
- * Removes the dist remote from the list of git remotes.
- *
- * @param {string} remote - The name of the remote to remove.
- */
-async function removeRemote (remote) {
-  try {
-    await run('git', ['remote', 'remove', remote])
-  } catch (error) {
-    // noop
-  }
-}
-
-/**
  * Returns the CDN purge root.
  *
  * @returns {string} The CDN purge root.
  */
 function getCdnPurgeRoot () {
-  const repoUrl = require('../package.json').repository.url
-  const data = url.parse(repoUrl).path.replace(/^\/(.*?)\/(.*?).git$/, '$1|$2').split('|')
+  const data = url.parse(REPO).path.replace(/^\/(.*?)\/(.*?).git$/, '$1|$2').split('|')
   const user = data[0]
   const repo = data[1]
 
-  return `https://purge.jsdelivr.net/gh/${user}/${repo}@latest`
+  return `https://purge.jsdelivr.net/gh/${user}/${repo}@dist`
 }
 
 // check CI environment
@@ -69,7 +57,7 @@ gulp.task('release:clear-dist', async () => {
   await del(DIST, { force: true })
 })
 
-gulp.task('release:prepare-repo', async () => {
+gulp.task('release:clone-repo', async () => {
   // check token
   const token = process.env.GH_TOKEN
 
@@ -77,36 +65,50 @@ gulp.task('release:prepare-repo', async () => {
     throw Error('GitHub token is not present.')
   }
 
-  // remove dist remote
-  await removeRemote('dist')
+  const url = `https://${token}@${withoutProtocol(REPO)}`
 
-  const repo = require('../package.json').repository.url
-  const url = `https://${token}@${withoutProtocol(repo)}`
-
-  // add dist remote
-  await run('git', ['remote', 'add', 'dist', url])
+  // clone repository into the dist directory
+  await run('git', ['clone', '-b', 'dist', '--single-branch', url, DIST])
 })
 
 gulp.task('release:create-content', async () => {
+  // check branch
+  const { stdout } = await run('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: DIST })
+
+  if (stdout !== 'dist') {
+    throw Error(`Branch must be 'dist', got: '${stdout}'.`)
+  }
+
+  // clean branch
+  // delete all files and dirs (inlcuding dotfiles and dotdirs), except .git dir
+  await del(['**', '.*', '!.git'], { cwd: DIST })
+
   const version = getVersion()
 
   // build scripts
   await run('npm', ['run', 'build', '--', `--${version}`])
 
-  // wait for a while for the files to be completely written to the disk
+  // copy necessary files
+  await gulp
+    .src(DEPLOY + '/**/*', { dot: true })
+    .pipe(template({
+      studio: require('../src/data/studio'),
+      project: require('../src/data/project'),
+      license: require('../src/data/license')
+    }))
+    .pipe(gulp.dest(DIST))
+
+  // wait for a while for the files to be completely copied
   await delay(2500)
 
   // commit files with next version
-  await run('git', ['add', '-f', 'dist'], { cwd: ROOT })
-  await run('git', ['commit', '-m', `chore(release): ${version} [skip ci]`], { cwd: ROOT })
+  await run('git', ['add', '.'], { cwd: DIST })
+  await run('git', ['commit', '-m', `chore(release): ${version} [skip ci]`], { cwd: DIST })
 })
 
 gulp.task('release:push-repo', async () => {
   // push content to remote repository
-  await run('git', ['push', '-u', 'dist', 'master'], { cwd: ROOT })
-
-  // remove dist remote
-  await removeRemote('dist')
+  await run('git', ['push', '-u', 'origin', 'dist'], { cwd: DIST })
 })
 
 gulp.task('release:purge-cache', async () => {
@@ -114,12 +116,12 @@ gulp.task('release:purge-cache', async () => {
   await delay(2500)
 
   // purge CDN cache
-  await axios(getCdnPurgeRoot() + '/dist/scripts.js')
+  await axios(getCdnPurgeRoot() + '/scripts.js')
 })
 
 gulp.task('release', gulp.series(
   'release:clear-dist',
-  'release:prepare-repo',
+  'release:clone-repo',
   'release:create-content',
   'release:push-repo',
   'release:purge-cache',
