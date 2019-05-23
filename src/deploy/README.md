@@ -1,1 +1,1 @@
-# <%= project.name %> dist
+# <%= project.name %> dist readme
