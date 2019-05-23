@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/sylviachrystall/studio_69445/compare/v1.1.2...v1.2.0) (2019-05-23)
+
+
+### Features
+
+* **common:** remove unnecessary index.js ([d32256f](https://github.com/sylviachrystall/studio_69445/commit/d32256f))
+
 ## [1.1.2](https://github.com/sylviachrystall/studio_69445/compare/v1.1.1...v1.1.2) (2019-05-23)
 
 
