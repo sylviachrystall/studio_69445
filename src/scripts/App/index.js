@@ -4,7 +4,7 @@ import Studio from '../Studio'
 import StyleAsset from '../Assets/StyleAsset'
 import MarkupAsset from '../Assets/MarkupAsset'
 
-const __LOADED_INDICATOR = '___' + uid(32) + 'Loaded'
+const __LOADED_INDICATOR = '___' + uid(32) + '_Loaded'
 
 class App {
   isLoaded () {
