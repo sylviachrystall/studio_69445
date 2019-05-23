@@ -1,3 +1,5 @@
 # studio_69445
 
-## Usage
+## License
+
+EPLA (c) 2015-2019 Sylvia Chrystall
